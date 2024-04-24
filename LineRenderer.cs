@@ -3,34 +3,34 @@ using System;
 
 public partial class LineRenderer : MeshInstance3D {
     [Export]
-    public Vector3[] points = [new Vector3(0, 0, 0), new Vector3(0, 5, 0)];
+    public Vector3[] Points = [new Vector3(0, 0, 0), new Vector3(0, 5, 0)];
 
     [Export]
-    public float start_thickness = 0.1f;
+    public float StartThickness = 0.1f;
 
     [Export]
-    public float end_thickness = 0.1f;
+    public float EndThickness = 0.1f;
 
     [Export]
-    public int corner_resolution = 5;
+    public int CornerResolution = 5;
 
     [Export]
-    public int cap_resolution = 5;
+    public int CapResolution = 5;
 
     [Export]
-    public bool draw_caps = true;
+    public bool DrawCaps = true;
 
     [Export]
-    public bool draw_corners = true;
+    public bool DrawCorners = true;
 
     [Export]
-    public bool use_global_coords = true;
+    public bool UseGlobalCoords = true;
 
     [Export]
-    public bool tile_texture = true;
+    public bool TileTexture = true;
 
-    private Camera3D camera;
-    private Vector3 cameraOrigin;
+    private Camera3D Camera;
+    private Vector3 CameraOrigin;
 
     public override void _EnterTree()
     {
@@ -44,189 +44,190 @@ public partial class LineRenderer : MeshInstance3D {
 
     public override void _PhysicsProcess(double delta)
     {
-        ImmediateMesh immediateMesh = (ImmediateMesh)Mesh;
-        if (points.Length < 2)
+        ImmediateMesh ImmediateMesh = (ImmediateMesh)Mesh;
+        if (Points.Length < 2)
         {
             return;
         }
 
-        camera = GetViewport().GetCamera3D();
-        if (camera == null)
+        Camera = GetViewport().GetCamera3D();
+        if (Camera == null)
         {
             return;
         }
-        cameraOrigin = ToLocal(camera.GlobalTransform.Origin);
+        CameraOrigin = ToLocal(Camera.GlobalTransform.Origin);
 
-        float progressStep = 1.0f / points.Length;
-        float progress = 0;
-        float thickness = Mathf.Lerp(start_thickness, end_thickness, progress);
-        float nextThickness = Mathf.Lerp(start_thickness, end_thickness, progress + progressStep);
+        float ProgressStep = 1.0f / Points.Length;
+        float Progress = 0;
+        float Thickness = Mathf.Lerp(StartThickness, EndThickness, Progress);
+        float NextThickness = Mathf.Lerp(StartThickness, EndThickness, Progress + ProgressStep);
 
-        immediateMesh.ClearSurfaces();
-        immediateMesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+        ImmediateMesh.ClearSurfaces();
+        ImmediateMesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
 
-        for (int i = 0; i < points.Length - 1; i++)
+        for (int i = 0; i < Points.Length - 1; i++)
         {
-            Vector3 A = points[i];
-            Vector3 B = points[i + 1];
+            Vector3 A = Points[i];
+            Vector3 B = Points[i + 1];
 
-            if (use_global_coords)
+            if (UseGlobalCoords)
             {
                 A = ToLocal(A);
                 B = ToLocal(B);
             }
 
             Vector3 AB = B - A;
-            Vector3 orthogonalABStart = (cameraOrigin - ((A + B) / 2)).Cross(AB).Normalized() * thickness;
-            Vector3 orthogonalABEnd = (cameraOrigin - ((A + B) / 2)).Cross(AB).Normalized() * nextThickness;
+            Vector3 OrthogonalABStart = (CameraOrigin - ((A + B) / 2)).Cross(AB).Normalized() * Thickness;
+            Vector3 OrthogonalABEnd = (CameraOrigin - ((A + B) / 2)).Cross(AB).Normalized() * NextThickness;
 
-            Vector3 AtoABStart = A + orthogonalABStart;
-            Vector3 AfromABStart = A - orthogonalABStart;
-            Vector3 BtoABEnd = B + orthogonalABEnd;
-            Vector3 BfromABEnd = B - orthogonalABEnd;
+            Vector3 AtoABStart = A + OrthogonalABStart;
+            Vector3 AfromABStart = A - OrthogonalABStart;
+            Vector3 BtoABEnd = B + OrthogonalABEnd;
+            Vector3 BfromABEnd = B - OrthogonalABEnd;
 
             if (i == 0)
             {
-                if (draw_caps)
+                if (DrawCaps)
                 {
-                    Cap(A, B, thickness, cap_resolution);
+                    Cap(A, B, Thickness, CapResolution);
                 }
             }
 
-            if (tile_texture)
+            if (TileTexture)
             {
                 float ABLen = AB.Length();
                 float ABFloor = Mathf.Floor(ABLen);
                 float ABFrac = ABLen - ABFloor;
 
-                immediateMesh.SurfaceSetUV(new Vector2(ABFloor, 0));
-                immediateMesh.SurfaceAddVertex(AtoABStart);
-                immediateMesh.SurfaceSetUV(new Vector2(-ABFrac, 0));
-                immediateMesh.SurfaceAddVertex(BtoABEnd);
-                immediateMesh.SurfaceSetUV(new Vector2(ABFloor, 1));
-                immediateMesh.SurfaceAddVertex(AfromABStart);
-                immediateMesh.SurfaceSetUV(new Vector2(-ABFrac, 0));
-                immediateMesh.SurfaceAddVertex(BtoABEnd);
-                immediateMesh.SurfaceSetUV(new Vector2(-ABFrac, 1));
-                immediateMesh.SurfaceAddVertex(BfromABEnd);
-                immediateMesh.SurfaceSetUV(new Vector2(ABFloor, 1));
-                immediateMesh.SurfaceAddVertex(AfromABStart);
+                ImmediateMesh.SurfaceSetUV(new Vector2(ABFloor, 0));
+                ImmediateMesh.SurfaceAddVertex(AtoABStart);
+                ImmediateMesh.SurfaceSetUV(new Vector2(-ABFrac, 0));
+                ImmediateMesh.SurfaceAddVertex(BtoABEnd);
+                ImmediateMesh.SurfaceSetUV(new Vector2(ABFloor, 1));
+                ImmediateMesh.SurfaceAddVertex(AfromABStart);
+                ImmediateMesh.SurfaceSetUV(new Vector2(-ABFrac, 0));
+                ImmediateMesh.SurfaceAddVertex(BtoABEnd);
+                ImmediateMesh.SurfaceSetUV(new Vector2(-ABFrac, 1));
+                ImmediateMesh.SurfaceAddVertex(BfromABEnd);
+                ImmediateMesh.SurfaceSetUV(new Vector2(ABFloor, 1));
+                ImmediateMesh.SurfaceAddVertex(AfromABStart);
             }
             else
             {
-                immediateMesh.SurfaceSetUV(new Vector2(1, 0));
-                immediateMesh.SurfaceAddVertex(AtoABStart);
-                immediateMesh.SurfaceSetUV(new Vector2(0, 0));
-                immediateMesh.SurfaceAddVertex(BtoABEnd);
-                immediateMesh.SurfaceSetUV(new Vector2(1, 1));
-                immediateMesh.SurfaceAddVertex(AfromABStart);
-                immediateMesh.SurfaceSetUV(new Vector2(0, 0));
-                immediateMesh.SurfaceAddVertex(BtoABEnd);
-                immediateMesh.SurfaceSetUV(new Vector2(0, 1));
-                immediateMesh.SurfaceAddVertex(BfromABEnd);
-                immediateMesh.SurfaceSetUV(new Vector2(1, 1));
-                immediateMesh.SurfaceAddVertex(AfromABStart);
+                ImmediateMesh.SurfaceSetUV(new Vector2(1, 0));
+                ImmediateMesh.SurfaceAddVertex(AtoABStart);
+                ImmediateMesh.SurfaceSetUV(new Vector2(0, 0));
+                ImmediateMesh.SurfaceAddVertex(BtoABEnd);
+                ImmediateMesh.SurfaceSetUV(new Vector2(1, 1));
+                ImmediateMesh.SurfaceAddVertex(AfromABStart);
+                ImmediateMesh.SurfaceSetUV(new Vector2(0, 0));
+                ImmediateMesh.SurfaceAddVertex(BtoABEnd);
+                ImmediateMesh.SurfaceSetUV(new Vector2(0, 1));
+                ImmediateMesh.SurfaceAddVertex(BfromABEnd);
+                ImmediateMesh.SurfaceSetUV(new Vector2(1, 1));
+                ImmediateMesh.SurfaceAddVertex(AfromABStart);
             }
 
-            if (i == points.Length - 2)
+            if (i == Points.Length - 2)
             {
-                if (draw_caps)
+                if (DrawCaps)
                 {
-                    Cap(B, A, nextThickness, cap_resolution);
+                    Cap(B, A, NextThickness, CapResolution);
                 }
             }
             else
             {
-                if (draw_corners)
+                if (DrawCorners)
                 {
-                    Vector3 C = points[i + 2];
-                    if (use_global_coords)
+                    Vector3 C = Points[i + 2];
+                    if (UseGlobalCoords)
                     {
                         C = ToLocal(C);
                     }
 
                     Vector3 BC = C - B;
-                    Vector3 orthogonalBCStart = (cameraOrigin - ((B + C) / 2)).Cross(BC).Normalized() * nextThickness;
+                    Vector3 OrthogonalBCStart = (CameraOrigin - ((B + C) / 2)).Cross(BC).Normalized() * NextThickness;
 
-                    float angleDot = AB.Dot(orthogonalBCStart);
+                    float AngleDot = AB.Dot(OrthogonalBCStart);
 
-                    if (angleDot > 0 && !Mathf.IsEqualApprox(angleDot, 1))
+                    if (AngleDot > 0 && !Mathf.IsEqualApprox(AngleDot, 1))
                     {
-                        Corner(B, BtoABEnd, B + orthogonalBCStart, corner_resolution);
+                        Corner(B, BtoABEnd, B + OrthogonalBCStart, CornerResolution);
                     }
-                    else if (angleDot < 0 && !Mathf.IsEqualApprox(angleDot, -1))
+                    else if (AngleDot < 0 && !Mathf.IsEqualApprox(AngleDot, -1))
                     {
-                        Corner(B, B - orthogonalBCStart, BfromABEnd, corner_resolution);
+                        Corner(B, B - OrthogonalBCStart, BfromABEnd, CornerResolution);
                     }
                 }
             }
 
-            progress += progressStep;
-            thickness = Mathf.Lerp(start_thickness, end_thickness, progress);
-            nextThickness = Mathf.Lerp(start_thickness, end_thickness, progress + progressStep);
+            Progress += ProgressStep;
+            Thickness = Mathf.Lerp(StartThickness, EndThickness, Progress);
+            NextThickness = Mathf.Lerp(StartThickness, EndThickness, Progress + ProgressStep);
         }
 
-        immediateMesh.SurfaceEnd();
+        ImmediateMesh.SurfaceEnd();
     }
 
-    private void Cap(Vector3 center, Vector3 pivot, float thickness, int cap_resolution)
+    private void Cap(Vector3 center, Vector3 pivot, float thickness, int capResolution)
     {
         ImmediateMesh immediateMesh = (ImmediateMesh)Mesh;
-        Vector3 orthogonal = (cameraOrigin - center).Cross(center - pivot).Normalized() * thickness;
-        Vector3 axis = (center - cameraOrigin).Normalized();
+        Vector3 Orthogonal = (CameraOrigin - center).Cross(center - pivot).Normalized() * thickness;
+        Vector3 Axis = (center - CameraOrigin).Normalized();
+        if(!Axis.IsNormalized()) return;
 
-        Vector3[] vertexArray = new Vector3[cap_resolution + 1];
-        for (int i = 0; i < cap_resolution + 1; i++)
+        Vector3[] VertexArray = new Vector3[capResolution + 1];
+        for (int i = 0; i < capResolution + 1; i++)
         {
-            vertexArray[i] = new Vector3(0, 0, 0);
+            VertexArray[i] = new Vector3(0, 0, 0);
         }
-        vertexArray[0] = center + orthogonal;
-        vertexArray[cap_resolution] = center - orthogonal;
+        VertexArray[0] = center + Orthogonal;
+        VertexArray[capResolution] = center - Orthogonal;
 
-        for (int i = 1; i < cap_resolution; i++)
+        for (int i = 1; i < capResolution; i++)
         {
-            vertexArray[i] = center + (orthogonal.Rotated(axis, Mathf.Lerp(0.0f, Mathf.Pi, (float)i / cap_resolution)));
+            VertexArray[i] = center + Orthogonal.Rotated(Axis, Mathf.Lerp(0.0f, Mathf.Pi, (float)i / capResolution));
         }
 
-        for (int i = 1; i < cap_resolution + 1; i++)
+        for (int i = 1; i < capResolution + 1; i++)
         {
-            immediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)cap_resolution));
-            immediateMesh.SurfaceAddVertex(vertexArray[i - 1]);
-            immediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)cap_resolution));
-            immediateMesh.SurfaceAddVertex(vertexArray[i]);
+            immediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)capResolution));
+            immediateMesh.SurfaceAddVertex(VertexArray[i - 1]);
+            immediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)capResolution));
+            immediateMesh.SurfaceAddVertex(VertexArray[i]);
             immediateMesh.SurfaceSetUV(new Vector2(0.5f, 0.5f));
             immediateMesh.SurfaceAddVertex(center);
         }
     }
 
-    private void Corner(Vector3 center, Vector3 start, Vector3 end, int cap_resolution)
+    private void Corner(Vector3 center, Vector3 start, Vector3 end, int capResolution)
     {
-        ImmediateMesh immediateMesh = (ImmediateMesh)Mesh;
-        Vector3[] vertexArray = new Vector3[cap_resolution + 1];
-        for (int i = 0; i < cap_resolution + 1; i++)
+        ImmediateMesh ImmediateMesh = (ImmediateMesh)Mesh;
+        Vector3[] VertexArray = new Vector3[capResolution + 1];
+        for (int i = 0; i < capResolution + 1; i++)
         {
-            vertexArray[i] = new Vector3(0, 0, 0);
+            VertexArray[i] = new Vector3(0, 0, 0);
         }
-        vertexArray[0] = start;
-        vertexArray[cap_resolution] = end;
+        VertexArray[0] = start;
+        VertexArray[capResolution] = end;
 
-        Vector3 axis = start.Cross(end).Normalized();
-        Vector3 offset = start - center;
-        float angle = offset.AngleTo(end - center);
+        Vector3 Axis = start.Cross(end).Normalized();
+        Vector3 Offset = start - center;
+        float angle = Offset.AngleTo(end - center);
 
-        for (int i = 1; i < cap_resolution; i++)
+        for (int i = 1; i < capResolution; i++)
         {
-            vertexArray[i] = center + offset.Rotated(axis, Mathf.Lerp(0.0f, angle, (float)i / cap_resolution));
+            VertexArray[i] = center + Offset.Rotated(Axis, Mathf.Lerp(0.0f, angle, (float)i / capResolution));
         }
 
-        for (int i = 1; i < cap_resolution + 1; i++)
+        for (int i = 1; i < capResolution + 1; i++)
         {
-            immediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)cap_resolution));
-            immediateMesh.SurfaceAddVertex(vertexArray[i - 1]);
-            immediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)cap_resolution));
-            immediateMesh.SurfaceAddVertex(vertexArray[i]);
-            immediateMesh.SurfaceSetUV(new Vector2(0.5f, 0.5f));
-            immediateMesh.SurfaceAddVertex(center);
+            ImmediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)capResolution));
+            ImmediateMesh.SurfaceAddVertex(VertexArray[i - 1]);
+            ImmediateMesh.SurfaceSetUV(new Vector2(0, (i - 1) / (float)capResolution));
+            ImmediateMesh.SurfaceAddVertex(VertexArray[i]);
+            ImmediateMesh.SurfaceSetUV(new Vector2(0.5f, 0.5f));
+            ImmediateMesh.SurfaceAddVertex(center);
         }
     }
 }
