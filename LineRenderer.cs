@@ -46,6 +46,7 @@ public partial class LineRenderer : MeshInstance3D {
         ImmediateMesh ImmediateMesh = (ImmediateMesh)Mesh;
         if (Points.Length < 2)
         {
+            ImmediateMesh.ClearSurfaces();
             return;
         }
 
