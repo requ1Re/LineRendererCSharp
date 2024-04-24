@@ -1,9 +1,8 @@
 using Godot;
-using System;
 
 public partial class LineRenderer : MeshInstance3D {
     [Export]
-    public Vector3[] Points = [new Vector3(0, 0, 0), new Vector3(0, 5, 0)];
+    public Vector3[] Points = [];
 
     [Export]
     public float StartThickness = 0.1f;
